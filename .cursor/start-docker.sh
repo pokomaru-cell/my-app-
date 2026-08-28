@@ -11,9 +11,10 @@ if docker info >/dev/null 2>&1; then
 fi
 
 log "Starting dockerd"
-sudo mkdir -p /var/log
-sudo nohup dockerd >/var/log/dockerd.log 2>&1 &
-disown || true
+# Run the whole pipeline as root so the log redirect (performed by the shell,
+# before sudo would apply) targets a root-writable path. Backgrounding inside
+# `sh -c` lets dockerd outlive this script.
+sudo sh -c 'mkdir -p /var/log && nohup dockerd >/var/log/dockerd.log 2>&1 &'
 
 log "Waiting for the Docker daemon to become ready"
 for _ in $(seq 1 60); do
