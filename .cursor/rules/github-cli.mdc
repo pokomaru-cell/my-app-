@@ -1,0 +1,51 @@
+---
+description: GitHub CLI (gh) usage rules for repository and GitHub operations
+alwaysApply: true
+---
+
+# GitHub CLI (gh) Operations
+
+Use GitHub CLI (`gh`) for GitHub operations when needed in this project.
+
+## Before Using gh
+
+- Check the current Git branch and `git status` before using `gh`.
+- Confirm the target repository and target branch before executing commands.
+- Work on a feature branch, not `main`, unless explicitly instructed otherwise.
+
+## Allowed Operations
+
+- View and create Issues and Pull Requests via `gh`.
+- Commit verified changes in appropriate units.
+- Push to the working branch after local verification succeeds.
+- Create Pull Requests targeting `main`.
+
+After code changes, when possible, run:
+
+1. `npm run lint`
+2. `npx tsc --noEmit` (typecheck)
+3. `npm run build`
+
+## Prohibited Operations
+
+- Do not merge into `main`; wait for explicit user approval.
+- Do not push directly to `main`.
+- Do not run data-loss operations:
+  - `git push --force`
+  - `git reset --hard`
+  - `git clean`
+- Do not perform destructive GitHub operations:
+  - Repository deletion
+  - Disabling GitHub Actions
+  - Changing GitHub Secrets
+
+## Conflicts and Secrets
+
+- When merge conflicts occur, do not delete existing changes without confirmation.
+- Do not display, copy, or commit API keys, passwords, Supabase Service Role Keys, or other secrets.
+- Do not include GitHub CLI credentials or tokens in code, logs, or commits.
+
+## Related Rules
+
+For general Git workflow and Agent permissions, see `git-workflow.mdc`.
+For security practices, see `security.mdc`.

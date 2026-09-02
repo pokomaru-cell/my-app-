@@ -6,28 +6,31 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import {
   formatActionResult,
   formatTransactionOutput,
+  formDataToTransactionInput,
   parseTransactionInput,
 } from "@/lib/transactions/parser";
 import type { Transaction } from "@/lib/types/transaction";
+import { TRANSACTION_SELECT_FIELDS } from "@/lib/types/transaction";
+
+async function getClientOrError(): Promise<
+  | { supabase: NonNullable<ReturnType<typeof createSupabaseServerClient>> }
+  | { error: string }
+> {
+  const supabase = createSupabaseServerClient();
+  if (!supabase) {
+    logger.error("Supabase client unavailable");
+    return {
+      error: "データベースが設定されていません。.env.local を確認してください",
+    };
+  }
+
+  return { supabase };
+}
 
 export async function createTransaction(formData: FormData): Promise<string> {
   logger.debug("createTransaction started");
 
-  const rawInput = {
-    type: String(formData.get("type") ?? ""),
-    amount: String(formData.get("amount") ?? ""),
-    description: String(formData.get("description") ?? ""),
-    transaction_date: String(formData.get("transaction_date") ?? ""),
-  };
-
-  logger.debug("Parsing transaction input", {
-    type: rawInput.type,
-    amountLength: rawInput.amount.length,
-    descriptionLength: rawInput.description.length,
-    hasDate: rawInput.transaction_date.length > 0,
-  });
-
-  const parsed = parseTransactionInput(rawInput);
+  const parsed = parseTransactionInput(formDataToTransactionInput(formData));
   if (!parsed.ok) {
     logger.warn("Transaction input validation failed", {
       reason: parsed.error,
@@ -35,24 +38,17 @@ export async function createTransaction(formData: FormData): Promise<string> {
     return formatActionResult(false, parsed.error);
   }
 
-  const supabase = createSupabaseServerClient();
-  if (!supabase) {
-    logger.error("Supabase client unavailable");
-    return formatActionResult(
-      false,
-      "データベースが設定されていません。.env.local を確認してください",
-    );
+  const clientResult = await getClientOrError();
+  if ("error" in clientResult) {
+    return formatActionResult(false, clientResult.error);
   }
 
-  logger.debug("Inserting transaction into database", {
-    type: parsed.data.type,
-    transaction_date: parsed.data.transaction_date,
-  });
+  const { supabase } = clientResult;
 
   const { data, error } = await supabase
     .from("transactions")
     .insert(parsed.data)
-    .select("id, type, amount, description, transaction_date, created_at")
+    .select(TRANSACTION_SELECT_FIELDS)
     .single();
 
   if (error) {
@@ -60,16 +56,99 @@ export async function createTransaction(formData: FormData): Promise<string> {
       code: error.code,
       message: error.message,
     });
-    return formatActionResult(false, "登録に失敗しました。しばらくしてから再試行してください");
+    return formatActionResult(
+      false,
+      "登録に失敗しました。しばらくしてから再試行してください",
+    );
   }
 
   const transaction = data as Transaction;
-  logger.debug("Transaction created successfully", { id: transaction.id });
-
   revalidatePath("/");
 
-  const output = formatTransactionOutput(transaction);
-  return formatActionResult(true, `登録しました — ${output}`);
+  return formatActionResult(
+    true,
+    `登録しました — ${formatTransactionOutput(transaction)}`,
+  );
+}
+
+export async function updateTransaction(
+  id: string,
+  formData: FormData,
+): Promise<string> {
+  logger.debug("updateTransaction started", { id });
+
+  if (!id) {
+    return formatActionResult(false, "更新対象が指定されていません");
+  }
+
+  const parsed = parseTransactionInput(formDataToTransactionInput(formData));
+  if (!parsed.ok) {
+    return formatActionResult(false, parsed.error);
+  }
+
+  const clientResult = await getClientOrError();
+  if ("error" in clientResult) {
+    return formatActionResult(false, clientResult.error);
+  }
+
+  const { supabase } = clientResult;
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .update(parsed.data)
+    .eq("id", id)
+    .select(TRANSACTION_SELECT_FIELDS)
+    .single();
+
+  if (error) {
+    logger.error("Failed to update transaction", {
+      code: error.code,
+      message: error.message,
+    });
+    return formatActionResult(
+      false,
+      "更新に失敗しました。しばらくしてから再試行してください",
+    );
+  }
+
+  const transaction = data as Transaction;
+  revalidatePath("/");
+
+  return formatActionResult(
+    true,
+    `更新しました — ${formatTransactionOutput(transaction)}`,
+  );
+}
+
+export async function deleteTransaction(id: string): Promise<string> {
+  logger.debug("deleteTransaction started", { id });
+
+  if (!id) {
+    return formatActionResult(false, "削除対象が指定されていません");
+  }
+
+  const clientResult = await getClientOrError();
+  if ("error" in clientResult) {
+    return formatActionResult(false, clientResult.error);
+  }
+
+  const { supabase } = clientResult;
+
+  const { error } = await supabase.from("transactions").delete().eq("id", id);
+
+  if (error) {
+    logger.error("Failed to delete transaction", {
+      code: error.code,
+      message: error.message,
+    });
+    return formatActionResult(
+      false,
+      "削除に失敗しました。しばらくしてから再試行してください",
+    );
+  }
+
+  revalidatePath("/");
+  return formatActionResult(true, "削除しました");
 }
 
 export async function getTransactions(): Promise<{
@@ -78,18 +157,19 @@ export async function getTransactions(): Promise<{
 }> {
   logger.debug("getTransactions started");
 
-  const supabase = createSupabaseServerClient();
-  if (!supabase) {
-    logger.error("Supabase client unavailable for fetch");
+  const clientResult = await getClientOrError();
+  if ("error" in clientResult) {
     return {
       transactions: [],
       error: "データベースが設定されていません",
     };
   }
 
+  const { supabase } = clientResult;
+
   const { data, error } = await supabase
     .from("transactions")
-    .select("id, type, amount, description, transaction_date, created_at")
+    .select(TRANSACTION_SELECT_FIELDS)
     .order("transaction_date", { ascending: false })
     .order("created_at", { ascending: false });
 
@@ -103,8 +183,6 @@ export async function getTransactions(): Promise<{
       error: "取引一覧の取得に失敗しました",
     };
   }
-
-  logger.debug("Transactions fetched", { count: data?.length ?? 0 });
 
   return {
     transactions: (data ?? []) as Transaction[],

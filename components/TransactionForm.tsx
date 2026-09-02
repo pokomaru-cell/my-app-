@@ -1,7 +1,14 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useActionState } from "react";
 import { createTransaction } from "@/app/actions/transactions";
+import {
+  getCategoriesForType,
+  type TransactionCategory,
+} from "@/lib/constants/categories";
+import { getDefaultCategory } from "@/lib/transactions/schema";
+import type { TransactionType } from "@/lib/types/transaction";
 
 const initialState = "";
 
@@ -13,7 +20,14 @@ function todayString(): string {
   return `${year}-${month}-${day}`;
 }
 
+const fieldClassName =
+  "rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
+
 export function TransactionForm() {
+  const [type, setType] = useState<TransactionType>("expense");
+  const [category, setCategory] = useState(getDefaultCategory("expense"));
+  const categories = useMemo(() => getCategoriesForType(type), [type]);
+
   const [result, formAction, isPending] = useActionState(
     async (_prev: string, formData: FormData) => createTransaction(formData),
     initialState,
@@ -22,8 +36,16 @@ export function TransactionForm() {
   const isSuccess = result.startsWith("OK:");
   const isError = result.startsWith("ERROR:");
 
+  function handleTypeChange(nextType: TransactionType) {
+    setType(nextType);
+    setCategory(getDefaultCategory(nextType));
+  }
+
   return (
-    <form action={formAction} className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+    <form
+      action={formAction}
+      className="flex flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+    >
       <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
         収入・支出を入力
       </h2>
@@ -33,12 +55,34 @@ export function TransactionForm() {
           <span className="font-medium text-zinc-700 dark:text-zinc-300">種別</span>
           <select
             name="type"
-            defaultValue="expense"
+            value={type}
+            onChange={(event) =>
+              handleTypeChange(event.target.value as TransactionType)
+            }
             required
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+            className={fieldClassName}
           >
             <option value="expense">支出</option>
             <option value="income">収入</option>
+          </select>
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm">
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">カテゴリ</span>
+          <select
+            name="category"
+            value={category}
+            onChange={(event) =>
+              setCategory(event.target.value as TransactionCategory)
+            }
+            required
+            className={fieldClassName}
+          >
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -50,19 +94,7 @@ export function TransactionForm() {
             inputMode="decimal"
             placeholder="1500"
             required
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">内容</span>
-          <input
-            type="text"
-            name="description"
-            placeholder="スーパーで買い物"
-            required
-            maxLength={200}
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+            className={fieldClassName}
           />
         </label>
 
@@ -73,7 +105,19 @@ export function TransactionForm() {
             name="transaction_date"
             defaultValue={todayString()}
             required
-            className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+            className={fieldClassName}
+          />
+        </label>
+
+        <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">メモ</span>
+          <input
+            type="text"
+            name="description"
+            placeholder="スーパーで買い物"
+            required
+            maxLength={200}
+            className={fieldClassName}
           />
         </label>
       </div>

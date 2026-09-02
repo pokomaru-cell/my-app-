@@ -1,0 +1,67 @@
+---
+description: Git workflow and safe version control practices for this project
+alwaysApply: true
+---
+
+# Git Workflow
+
+This project uses Git for version control. Follow these rules when making changes.
+
+## Branch and State
+
+- Check the current branch and `git status` before starting work.
+- **Direct push to `main` is prohibited.** Never push commits directly to `main`.
+- Do not modify `main` directly; use a feature branch for changes.
+- Create one clear commit per change or feature.
+- Write concise commit messages that describe what changed.
+- Do not delete or overwrite existing changes without explicit approval.
+
+## Agent Permissions
+
+The Agent may perform the following Git operations:
+
+- Create a working branch when needed (e.g. `feature/...`, `chore/...`, `fix/...`).
+- Commit changes in logical units (one commit per change or feature).
+- Push to the working branch after local verification succeeds (`npm run lint`, `npm run build`, etc.).
+- Create a Pull Request targeting `main`.
+
+The Agent must **not** merge into `main` without explicit user approval. Merging to `main` is the user's responsibility after reviewing the PR.
+
+## Secrets and Ignored Files
+
+- Never commit `.env`, API keys, secret keys, passwords, or other secrets.
+- Keep `.gitignore` appropriate and up to date.
+- Do not expose Supabase Service Role Keys or other privileged credentials.
+
+## Dangerous Operations
+
+Do not run these data-loss operations:
+
+- `git push --force`
+- `git reset --hard`
+- `git clean`
+
+## Push and Conflicts
+
+- Before pushing, review the changed files and target branch.
+- When resolving merge conflicts, do not remove important changes without confirmation.
+- Do not confuse "verified locally" with "pushed to GitHub".
+- Be careful with history-rewriting operations; do not rewrite existing commits unnecessarily.
+
+## Quality Checks Before Commit
+
+After code changes, when possible:
+
+1. Run `npm run lint`
+2. Run typecheck (`npx tsc --noEmit`) when relevant
+3. Run `npm run build` when relevant
+
+If errors occur, investigate and fix before committing.
+
+## CI and Automation
+
+- **CI** (`.github/workflows/ci.yml`): runs `npm ci`, `npm run lint`, and `npm run build` on push/PR to `main`.
+- **CodeQL** (`.github/workflows/codeql.yml`): security analysis for JavaScript/TypeScript.
+- **Dependabot** (`.github/dependabot.yml`): monitors npm and GitHub Actions dependencies.
+
+Do not duplicate CI steps in other workflows unless there is a clear reason.
