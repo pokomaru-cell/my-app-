@@ -1,0 +1,33 @@
+---
+description: Security rules for API keys, Supabase, validation, and error handling
+alwaysApply: true
+---
+
+# Security Rules
+
+## Secrets and Environment Variables
+
+- Do not hardcode API keys, secret keys, passwords, or Service Role Keys in source code.
+- Manage secrets with environment variables; never commit them to Git.
+- Use `NEXT_PUBLIC_` only for information that is safe to expose in the browser.
+- Keep development and production secrets separate.
+- Do not display, copy, or guess existing secret values.
+
+## Supabase
+
+- Assume Row Level Security (RLS) is required; users must not access other users' data.
+- Never expose the Supabase Service Role Key to client-side code.
+- Do not connect CI to the Supabase database or modify production data from CI.
+- Use parameterized queries; never build SQL by string concatenation.
+
+## Input and Authorization
+
+- Do not trust user input; always validate it.
+- Check authorization, not only authentication, for protected actions.
+- Do not include secrets or internal details in error messages shown to users.
+
+## TypeScript and Risk Review
+
+- Do not use `any` in TypeScript.
+- Before security-related changes, consider potential risks and safer alternatives.
+- If a change weakens security, explain the risk and propose alternatives before proceeding.

@@ -1,0 +1,16 @@
+---
+description: Supabase project reference for MCP and app configuration
+alwaysApply: true
+---
+
+# Supabase Project
+
+This repository uses the following Supabase project:
+
+- **Project ID (ref):** `xcmnmvhneqxtwyucyuvw`
+- **API URL:** `https://xcmnmvhneqxtwyucyuvw.supabase.co`
+- **Region:** `ap-northeast-1`
+
+When using Supabase MCP tools, always pass `project_id` / `id` as `xcmnmvhneqxtwyucyuvw` unless the MCP server is already project-scoped via `.cursor/mcp.json`.
+
+The Next.js app reads credentials from `.env.local` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).

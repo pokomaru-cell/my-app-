@@ -1,0 +1,72 @@
+---
+description: Core coding standards for TypeScript implementation and change management
+alwaysApply: true
+---
+
+# Code Standards
+
+## TypeScript
+
+- Use TypeScript for all application code.
+- Do not use `any`.
+
+## Before Implementing
+
+- Review related existing code, design, and naming conventions before making changes.
+- Preserve existing code style, architecture, and naming patterns whenever possible.
+- Do not add unnecessary libraries or files.
+- Do not break existing features.
+- Avoid excessive refactoring unrelated to the current task.
+
+## Library and API Additions
+
+When you find a library or API that appears highly reusable across future projects—not only the current one—and has significant benefits, **do not install, configure, or implement it without prior user approval**.
+
+**Propose when appropriate.** If a library or API would clearly help the current task or future projects, report it to the user and ask for approval. Do not skip a worthwhile proposal just because approval is required.
+
+Do not propose libraries or APIs without a clear benefit. Avoid unnecessary or speculative suggestions.
+
+Until approval is granted, do not:
+
+- Install packages
+- Add configuration
+- Implement integrations
+
+When reporting a candidate library or API, briefly explain:
+
+- **Name**
+- **Purpose**
+- **Why it is needed for this project**
+- **Reusability across other projects**
+- **Overlap or conflict with existing libraries or features**
+- **Benefits and drawbacks of adoption**
+- **Alternatives if not adopted**
+- **Cost and usage limits** (for APIs)
+
+For Zod and shadcn/ui specifically, also follow `tech-stack.mdc`.
+
+## Validation, Auth, and Data Access
+
+- Validate user input appropriately (prefer Zod; see `tech-stack.mdc`).
+- Implement authentication and authorization correctly.
+- For Supabase tables that store user data, enable RLS and design policies for proper auth and access control.
+- Do not expose secrets on the client side (see `security.mdc`).
+
+## Error Handling and Debugging
+
+- Handle errors appropriately; do not expose secrets or internal details to users.
+- When errors occur, investigate the cause before changing code.
+- Do not make unnecessary fixes outside the scope of the current change.
+
+## Reporting
+
+After completing implementation, briefly report:
+
+- What was implemented
+- Which files were changed
+
+## Related Rules
+
+- Security practices: `security.mdc`
+- Zod and shadcn/ui: `tech-stack.mdc`
+- Git and GitHub operations: `git-workflow.mdc`, `github-cli.mdc`

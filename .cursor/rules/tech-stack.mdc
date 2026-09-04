@@ -1,0 +1,43 @@
+---
+description: Zod validation and shadcn/ui component conventions for this project
+alwaysApply: true
+---
+
+# Tech Stack: Zod and shadcn/ui
+
+## Before Adding Dependencies
+
+Before introducing Zod or shadcn/ui, check:
+
+- `package.json` / `package-lock.json`
+- `components.json` (shadcn/ui)
+- `components/ui/` (existing UI components)
+- Existing validation code (e.g. `lib/**/parser.ts`)
+
+If already installed or initialized, **do not add them again**.
+
+Current project status:
+
+- **Zod**: installed (`zod` in `package.json`)
+- **shadcn/ui**: initialized (`components.json`, `components/ui/`, `lib/utils.ts`)
+
+## Zod
+
+Use Zod for validation of:
+
+- User input (forms, query parameters)
+- External data (API responses, webhooks)
+- Data parsed before database operations
+
+Prefer Zod schemas over ad-hoc regex or manual checks for new validation logic.
+When refactoring existing parsers, migrate to Zod only when it is part of the current task.
+
+## shadcn/ui
+
+Use shadcn/ui as the foundation for UI components.
+
+- Initialize according to the existing project setup (`components.json`, Tailwind in `app/globals.css`, `@/` aliases).
+- Add only the components needed for the current task (`npx shadcn@latest add <component>`).
+- Do not bulk-add unused components.
+- Place components under `components/ui/` and compose them in feature components under `components/`.
+- Reuse existing UI components before adding new ones.
