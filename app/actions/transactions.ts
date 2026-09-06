@@ -13,10 +13,13 @@ import type { Transaction } from "@/lib/types/transaction";
 import { TRANSACTION_SELECT_FIELDS } from "@/lib/types/transaction";
 
 async function getClientOrError(): Promise<
-  | { supabase: NonNullable<ReturnType<typeof createSupabaseServerClient>> }
+  | {
+      supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
+      userId: string;
+    }
   | { error: string }
 > {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   if (!supabase) {
     logger.error("Supabase client unavailable");
     return {
@@ -24,7 +27,17 @@ async function getClientOrError(): Promise<
     };
   }
 
-  return { supabase };
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    logger.warn("Unauthenticated transaction access attempt");
+    return { error: "ログインが必要です" };
+  }
+
+  return { supabase, userId: user.id };
 }
 
 export async function createTransaction(formData: FormData): Promise<string> {
@@ -43,11 +56,11 @@ export async function createTransaction(formData: FormData): Promise<string> {
     return formatActionResult(false, clientResult.error);
   }
 
-  const { supabase } = clientResult;
+  const { supabase, userId } = clientResult;
 
   const { data, error } = await supabase
     .from("transactions")
-    .insert(parsed.data)
+    .insert({ ...parsed.data, user_id: userId })
     .select(TRANSACTION_SELECT_FIELDS)
     .single();
 
@@ -161,7 +174,7 @@ export async function getTransactions(): Promise<{
   if ("error" in clientResult) {
     return {
       transactions: [],
-      error: "データベースが設定されていません",
+      error: clientResult.error,
     };
   }
 
