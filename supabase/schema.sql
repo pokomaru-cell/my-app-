@@ -2,6 +2,7 @@
 
 CREATE TABLE IF NOT EXISTS transactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
   amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
   description TEXT NOT NULL,
@@ -13,6 +14,7 @@ CREATE TABLE IF NOT EXISTS transactions (
 
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (transaction_date DESC);
 CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions (category);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions (user_id);
 
 -- 日ごとの収入・支出・合計ビュー
 CREATE OR REPLACE VIEW daily_summary
@@ -42,14 +44,16 @@ ORDER BY month DESC;
 
 ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Allow public read" ON transactions
-  FOR SELECT USING (true);
+CREATE POLICY "Users can read own transactions" ON transactions
+  FOR SELECT USING (auth.uid() = user_id);
 
-CREATE POLICY "Allow public insert" ON transactions
-  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Users can insert own transactions" ON transactions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Allow public update" ON transactions
-  FOR UPDATE USING (true) WITH CHECK (true);
+CREATE POLICY "Users can update own transactions" ON transactions
+  FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
 
-CREATE POLICY "Allow public delete" ON transactions
-  FOR DELETE USING (true);
+CREATE POLICY "Users can delete own transactions" ON transactions
+  FOR DELETE USING (auth.uid() = user_id);
