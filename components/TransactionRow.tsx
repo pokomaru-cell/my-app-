@@ -6,6 +6,7 @@ import {
   updateTransaction,
 } from "@/app/actions/transactions";
 import { getCategoriesForType, type TransactionCategory } from "@/lib/constants/categories";
+import { formatTransactionDescription } from "@/lib/transactions/parser";
 import { getDefaultCategory } from "@/lib/transactions/schema";
 import type { Transaction, TransactionType } from "@/lib/types/transaction";
 
@@ -115,7 +116,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
           </label>
 
           <label className="flex flex-col gap-1 text-sm sm:col-span-2">
-            <span className="text-zinc-600 dark:text-zinc-400">メモ</span>
+            <span className="text-zinc-600 dark:text-zinc-400">メモ（任意）</span>
             <input
               type="text"
               name="description"
@@ -154,7 +155,7 @@ export function TransactionRow({ transaction }: TransactionRowProps) {
             {transaction.category}
           </span>
           <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">
-            {transaction.description}
+            {formatTransactionDescription(transaction.description)}
           </p>
         </div>
         <p className="text-zinc-500 dark:text-zinc-400">

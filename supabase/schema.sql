@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS transactions (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   type TEXT NOT NULL CHECK (type IN ('income', 'expense')),
   amount NUMERIC(12, 2) NOT NULL CHECK (amount > 0),
-  description TEXT NOT NULL,
+  description TEXT NOT NULL DEFAULT '' CHECK (char_length(description) <= 200),
   category TEXT NOT NULL DEFAULT 'その他'
     CHECK (category IN ('食費', '交通費', '娯楽', '光熱費', '給料', 'その他')),
   transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,

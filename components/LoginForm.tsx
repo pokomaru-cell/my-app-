@@ -2,13 +2,19 @@
 
 import { useActionState } from "react";
 import { signIn, signUp } from "@/app/actions/auth";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { PasswordInput } from "@/components/PasswordInput";
 
 const initialState = "";
 
 const fieldClassName =
-  "rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
+  "w-full rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50";
 
-export function LoginForm() {
+interface LoginFormProps {
+  authErrorMessage?: string | null;
+}
+
+export function LoginForm({ authErrorMessage }: LoginFormProps) {
   const [signInMessage, signInAction, isSigningIn] = useActionState(
     async (_prev: string, formData: FormData) => signIn(formData),
     initialState,
@@ -20,16 +26,30 @@ export function LoginForm() {
 
   return (
     <div className="grid gap-8">
+      {authErrorMessage && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
+          {authErrorMessage}
+        </p>
+      )}
+
+      <div className="flex flex-col gap-3">
+        <GoogleSignInButton />
+        <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+          またはメールアドレスで続行
+        </p>
+      </div>
+
       <form action={signInAction} className="flex flex-col gap-4">
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           ログイン
         </h2>
 
-        <label className="flex flex-col gap-1.5 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm" htmlFor="sign-in-email">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             メールアドレス
           </span>
           <input
+            id="sign-in-email"
             type="email"
             name="email"
             autoComplete="email"
@@ -38,16 +58,14 @@ export function LoginForm() {
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm" htmlFor="sign-in-password">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             パスワード
           </span>
-          <input
-            type="password"
+          <PasswordInput
+            id="sign-in-password"
             name="password"
             autoComplete="current-password"
-            required
-            minLength={8}
             className={fieldClassName}
           />
         </label>
@@ -67,7 +85,10 @@ export function LoginForm() {
         )}
       </form>
 
-      <form action={signUpAction} className="flex flex-col gap-4 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+      <form
+        action={signUpAction}
+        className="flex flex-col gap-4 border-t border-zinc-200 pt-8 dark:border-zinc-800"
+      >
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           新規登録
         </h2>
@@ -75,11 +96,12 @@ export function LoginForm() {
           初めての方はこちらからアカウントを作成してください。
         </p>
 
-        <label className="flex flex-col gap-1.5 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm" htmlFor="sign-up-email">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             メールアドレス
           </span>
           <input
+            id="sign-up-email"
             type="email"
             name="email"
             autoComplete="email"
@@ -88,16 +110,14 @@ export function LoginForm() {
           />
         </label>
 
-        <label className="flex flex-col gap-1.5 text-sm">
+        <label className="flex flex-col gap-1.5 text-sm" htmlFor="sign-up-password">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             パスワード
           </span>
-          <input
-            type="password"
+          <PasswordInput
+            id="sign-up-password"
             name="password"
             autoComplete="new-password"
-            required
-            minLength={8}
             className={fieldClassName}
           />
         </label>

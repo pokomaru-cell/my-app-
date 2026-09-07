@@ -24,7 +24,12 @@ export function formatTransactionOutput(transaction: Transaction): string {
   const label = transaction.type === "income" ? "収入" : "支出";
   const sign = transaction.type === "income" ? "+" : "-";
   const formattedAmount = transaction.amount.toLocaleString("ja-JP");
-  return `[${label}] ${transaction.transaction_date} ${transaction.category} ${transaction.description} ${sign}${formattedAmount}円`;
+  const memo = transaction.description.trim() || "（メモなし）";
+  return `[${label}] ${transaction.transaction_date} ${transaction.category} ${memo} ${sign}${formattedAmount}円`;
+}
+
+export function formatTransactionDescription(description: string): string {
+  return description.trim() || "（メモなし）";
 }
 
 export function formatActionResult(
