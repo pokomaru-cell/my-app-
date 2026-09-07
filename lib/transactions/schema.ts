@@ -27,7 +27,6 @@ const rawTransactionFields = {
   description: z
     .string()
     .trim()
-    .min(1, "メモを入力してください")
     .max(200, "メモは200文字以内で入力してください"),
   category: categorySchema,
   transaction_date: z

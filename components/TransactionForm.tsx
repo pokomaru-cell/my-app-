@@ -110,12 +110,13 @@ export function TransactionForm() {
         </label>
 
         <label className="flex flex-col gap-1.5 text-sm sm:col-span-2">
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">メモ</span>
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+            メモ（任意）
+          </span>
           <input
             type="text"
             name="description"
             placeholder="スーパーで買い物"
-            required
             maxLength={200}
             className={fieldClassName}
           />
