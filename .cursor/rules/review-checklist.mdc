@@ -1,0 +1,47 @@
+---
+description: Pre-merge and pre-commit verification checklist for agents and humans
+alwaysApply: false
+---
+
+# Review Checklist
+
+Use before opening or merging a PR.
+
+## Automated gates
+
+```bash
+npm run lint
+npx tsc --noEmit
+npm run build
+```
+
+## Security
+
+- [ ] No `.env` or secrets in `git diff --staged`
+- [ ] No service role key in client or `NEXT_PUBLIC_*` vars
+- [ ] Server Actions that touch data verify user via `getUser()`
+- [ ] New/changed tables have RLS and policies tested mentally against `auth.uid()`
+- [ ] User-facing errors do not leak internal details
+
+## Code quality
+
+- [ ] No `any`
+- [ ] Changes match existing naming and folder layout
+- [ ] No unrelated refactors bundled in the same PR
+- [ ] OAuth/public routes listed in `proxy.ts` if added
+
+## Database
+
+- [ ] Migration file + `schema.sql` stay in sync
+- [ ] CHECK constraints match Zod rules (e.g. description length, categories)
+
+## Git / GitHub
+
+- [ ] Branch off `main`; not pushing directly to `main`
+- [ ] Commit message describes why
+- [ ] Dependabot major bumps: confirm CI (TS 7 / ESLint 10 were previously rejected)
+
+## Manual (when relevant)
+
+- [ ] Supabase Dashboard: redirect URLs, Google provider, email confirm setting
+- [ ] New env vars documented in README or `.env.example` if added

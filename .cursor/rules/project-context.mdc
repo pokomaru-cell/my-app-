@@ -1,0 +1,51 @@
+---
+description: Product scope, domain model, and folder map for this household ledger app
+alwaysApply: false
+---
+
+# Project Context
+
+## Product
+
+Japanese household ledger (家計簿):
+
+- Register **income** / **expense** with amount, date, optional memo, category
+- List transactions by date (newest first)
+- Edit and delete rows
+- **Categories:** 食費, 交通費, 娯楽, 光熱費, 給料, その他 (see `lib/constants/categories.ts`)
+- **Monthly summary:** income, expense, net for current month
+- **Charts:** category expense pie (current month), monthly expense bar trend
+
+## Auth
+
+- Email + password and Google OAuth (`components/GoogleSignInButton.tsx`)
+- Session: `@supabase/ssr`, `proxy.ts` protects `/`; public: `/login`, `/auth/callback`
+- Empty memo allowed (app + DB constraint `char_length(description) <= 200`)
+
+## Database (`transactions`)
+
+| Column | Notes |
+|--------|--------|
+| `user_id` | Required for RLS; set from auth on insert |
+| `type` | `income` \| `expense` |
+| `amount` | positive numeric |
+| `description` | memo; may be empty string |
+| `category` | fixed set (CHECK) |
+| `transaction_date` | date |
+
+Views: `daily_summary`, `monthly_summary` (security invoker).
+
+## Where to change what
+
+| Change | Primary files |
+|--------|-----------------|
+| Categories | `lib/constants/categories.ts`, `supabase/schema.sql`, migration |
+| Input rules | `lib/transactions/schema.ts` |
+| CRUD logic | `app/actions/transactions.ts` |
+| Auth | `app/actions/auth.ts`, `lib/auth/schema.ts`, `proxy.ts` |
+| Home UI | `app/page.tsx`, `components/*` |
+| Aggregations | `lib/transactions/stats.ts` |
+
+## Environment
+
+Local: `.env.local` with `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Never commit.

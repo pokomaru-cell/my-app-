@@ -1,0 +1,36 @@
+---
+description: GitHub security automation and private-repo limitations
+alwaysApply: false
+---
+
+# GitHub Security
+
+## Workflows (`.github/workflows/`)
+
+| Workflow | Purpose |
+|----------|---------|
+| `ci.yml` | `npm ci`, lint, build on PR/push to `main` |
+| `codeql.yml` | CodeQL analysis (may fail on private Free until Code scanning enabled) |
+| `dependabot.yml` | Weekly npm + GitHub Actions updates |
+
+## Dependabot
+
+- Review CI (Lint and Build), not CodeQL alone, for merge decisions.
+- Skip or close majors that break lint (e.g. TypeScript 7, ESLint 10) until ecosystem supports them.
+- GitHub Actions PRs that edit workflows may require `workflow` OAuth scope for `gh pr merge`; manual apply or re-auth if blocked.
+
+## Private repository limits
+
+On GitHub Free private repos, some features require GitHub Advanced Security or a public repo:
+
+- Code scanning upload (CodeQL)
+- Secret scanning push protection API
+
+This repo does not use a Dependency Review workflow (only `ci.yml` and `codeql.yml`).
+
+Keep repo private if required; enable Code scanning later for final verification if needed.
+
+## Agent permissions
+
+- May create PRs and push feature branches; **must not merge `main` without user approval**
+- Do not disable Actions, delete repo, or change GitHub Secrets

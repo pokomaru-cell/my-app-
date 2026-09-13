@@ -70,3 +70,5 @@ After completing implementation, briefly report:
 - Security practices: `security.mdc`
 - Zod and shadcn/ui: `tech-stack.mdc`
 - Git and GitHub operations: `git-workflow.mdc`, `github-cli.mdc`
+- Project map and agent workflow: `project-context.mdc`, `agent-workflow.mdc`, `nextjs-supabase-patterns.mdc`
+- Entry point for all agents: `AGENTS.md` (root)
