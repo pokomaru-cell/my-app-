@@ -1,0 +1,5 @@
+# Cursor legacy pointer — canonical instructions are in AGENTS.md and .cursor/rules/
+
+@AGENTS.md
+
+When in doubt, read `AGENTS.md` first, then the matching `.cursor/rules/*.mdc` file.

@@ -1,0 +1,47 @@
+---
+description: How coding agents should work in this repository
+alwaysApply: false
+---
+
+# Agent Workflow
+
+Adapted from common Next.js + Supabase agent playbooks; tuned for this repo.
+
+## Briefing
+
+Be specific. Include file paths, table/column names, expected behavior, and edge cases.
+
+**Good:** “Allow empty memo on edit in `TransactionRow.tsx`; keep Zod aligned with `schema.ts` and DB CHECK.”
+
+**Bad:** “Fix the form.”
+
+## Agents do well
+
+- Implement a described spec using existing patterns
+- Single-file UI or schema changes
+- Tracing errors using server logs (`lib/logger.ts`) and Supabase MCP
+- Running `npm run lint`, `npx tsc --noEmit`, `npm run build`
+
+## Agents do poorly
+
+- Product decisions without user input
+- Large refactors outside the task
+- Adding Stripe, orgs, or new frameworks without approval
+- Assuming Next.js 14/15 APIs (`middleware.ts` naming, old auth helpers)
+
+## Task rules
+
+- One logical change per branch/PR when possible
+- Read related code before editing (`code-standards.mdc`)
+- After edits: lint + typecheck + build when relevant
+- Stage files intentionally; do not `git add .` blindly
+- Do not commit unless the user asks
+- Do not merge to `main` without explicit user approval
+
+## After implementation
+
+Report briefly: what changed, which files, and any manual steps (Supabase Dashboard, env vars).
+
+## Review
+
+Use `review-checklist.mdc` before merge. For deep review, follow `.cursor/agents/code-reviewer.md`.

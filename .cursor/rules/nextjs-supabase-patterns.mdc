@@ -1,0 +1,49 @@
+---
+description: Next.js 16 App Router and Supabase patterns used in this codebase
+alwaysApply: false
+---
+
+# Next.js + Supabase Patterns
+
+## Next.js 16
+
+- **Proxy:** `proxy.ts` at repo root (replaces deprecated `middleware.ts`). Export `proxy()` and `config.matcher`.
+- **Docs:** Read `node_modules/next/dist/docs/` before changing routing or proxy behavior.
+- **Server Actions:** `"use server"` in `app/actions/*.ts`; call from forms or `useActionState`.
+- **Dynamic home:** `app/page.tsx` uses `export const dynamic = "force-dynamic"` for fresh data.
+
+## Supabase clients
+
+| Context | Module |
+|---------|--------|
+| Server Components / Server Actions | `await createSupabaseServerClient()` from `lib/supabase/server.ts` |
+| Client components (OAuth button) | `createSupabaseBrowserClient()` from `lib/supabase/client.ts` |
+| Proxy session refresh | `updateSession()` in `lib/supabase/proxy.ts` |
+
+- Server client is **async** and cookie-based (`@supabase/ssr`). Do not cache a singleton server client across requests.
+- Use **`getUser()`** for auth checks, not `getSession()` alone.
+- There is **no** `lib/supabase/admin.ts` (service role). Do not add service role usage without user approval and security review.
+
+## Auth and routes
+
+- Protected: `/` and all routes except public list in `proxy.ts` (`/login`, `/auth/callback`).
+- OAuth: browser `signInWithOAuth` → Google → Supabase → `/auth/callback` → `exchangeCodeForSession`.
+- Redirect URLs must be configured in Supabase Dashboard (Site URL + redirect allow list).
+
+## Data access
+
+- Inserts must include `user_id` from authenticated user (`app/actions/transactions.ts`).
+- RLS policies: `auth.uid() = user_id` for SELECT/INSERT/UPDATE/DELETE.
+- Schema changes: add SQL under `supabase/migrations/`, update `supabase/schema.sql`, apply via Supabase MCP when appropriate.
+- Do not build SQL with string concatenation from user input.
+
+## UI stack
+
+- shadcn/ui in `components/ui/`; feature components in `components/`.
+- Tailwind 4; `cn()` from `lib/utils.ts`.
+- Charts: recharts + `components/ui/chart.tsx`.
+
+## Validation
+
+- Zod schemas in `lib/transactions/schema.ts`, `lib/auth/schema.ts`.
+- Parsers in `lib/transactions/parser.ts` return user-safe messages via `formatActionResult`.
