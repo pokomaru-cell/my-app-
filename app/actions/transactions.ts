@@ -104,12 +104,13 @@ export async function updateTransaction(
     return formatActionResult(false, clientResult.error);
   }
 
-  const { supabase } = clientResult;
+  const { supabase, userId } = clientResult;
 
   const { data, error } = await supabase
     .from("transactions")
     .update(parsed.data)
     .eq("id", id)
+    .eq("user_id", userId)
     .select(TRANSACTION_SELECT_FIELDS)
     .single();
 
@@ -145,9 +146,13 @@ export async function deleteTransaction(id: string): Promise<string> {
     return formatActionResult(false, clientResult.error);
   }
 
-  const { supabase } = clientResult;
+  const { supabase, userId } = clientResult;
 
-  const { error } = await supabase.from("transactions").delete().eq("id", id);
+  const { error } = await supabase
+    .from("transactions")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) {
     logger.error("Failed to delete transaction", {

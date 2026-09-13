@@ -79,9 +79,13 @@ supabase/
 - Bulk shadcn component installs
 - TypeScript 7 / ESLint 10 (ecosystem not ready)
 
+## Stack manifest
+
+**Pack:** `nextjs-supabase` (see `.cursor/stack.json`). Shared rules live in [cursor-dev-templates](https://github.com/pokomaru-cell/cursor-dev-templates) under `stacks/nextjs-supabase/`.
+
 ## Cursor rules
 
-**Always applied:** `code-standards`, `tech-stack`, `security`, `git-workflow`, `github-cli`, `supabase-project` (under `.cursor/rules/`).
+**Always applied:** `stack`, `code-standards`, `tech-stack`, `security`, `git-workflow`, `github-cli`, `supabase-project` (under `.cursor/rules/`).
 
 **Load when relevant:** `project-context`, `agent-workflow`, `nextjs-supabase-patterns`, `review-checklist`, `github-security`.
 
