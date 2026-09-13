@@ -1,0 +1,18 @@
+---
+description: Declared stack pack (Next.js + Supabase) — read with .cursor/stack.json
+alwaysApply: true
+---
+
+# Stack declaration
+
+This repository uses the **`nextjs-supabase`** configuration pack.
+
+- **Manifest:** `.cursor/stack.json` (technologies, rule lists, template repo path)
+- **Patterns:** `nextjs-supabase-patterns.mdc` when changing routing, auth, or Supabase access
+- **Shared templates:** `pokomaru-cell/cursor-dev-templates` → `stacks/nextjs-supabase`
+
+## Assumed stack
+
+Next.js **16** App Router (`proxy.ts`, not legacy `middleware.ts`) · React 19 · Supabase (`@supabase/ssr`, Postgres **RLS**, `getUser()`) · Zod · shadcn/ui · Tailwind 4 · npm
+
+Do not introduce a separate REST API layer, service-role Supabase client, or Pages Router patterns unless the user explicitly approves.

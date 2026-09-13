@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "id": "nextjs-supabase",
+  "label": "Next.js 16 App Router + Supabase",
+  "templateRepo": "pokomaru-cell/cursor-dev-templates",
+  "templatePath": "stacks/nextjs-supabase",
+  "technologies": {
+    "language": "typescript",
+    "framework": "nextjs",
+    "nextRouter": "app",
+    "nextProxy": "proxy.ts",
+    "react": 19,
+    "database": "supabase-postgres",
+    "supabaseClient": "@supabase/ssr",
+    "auth": "supabase-auth-rls",
+    "validation": "zod",
+    "ui": "shadcn-ui",
+    "css": "tailwind-4",
+    "packageManager": "npm"
+  },
+  "cursor": {
+    "rulesAlwaysApply": [
+      "code-standards",
+      "tech-stack",
+      "security",
+      "git-workflow",
+      "github-cli",
+      "supabase-project",
+      "stack"
+    ],
+    "rulesOnDemand": [
+      "project-context",
+      "agent-workflow",
+      "nextjs-supabase-patterns",
+      "review-checklist",
+      "github-security"
+    ]
+  }
+}
