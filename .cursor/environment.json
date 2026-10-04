@@ -1,0 +1,12 @@
+{
+  "name": "my-app (Next.js + Supabase)",
+  "install": "./.cursor/install.sh",
+  "start": "./.cursor/start.sh",
+  "terminals": [
+    {
+      "name": "next-dev",
+      "command": "npm run dev"
+    }
+  ],
+  "ports": [3000, 54321, 54323, 54324]
+}
